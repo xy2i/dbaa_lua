@@ -39,7 +39,7 @@ local function Display(x, y)
 	local x_pos_sub = memory.read_u8(x_pos_addr, "Combined WRAM")
 	local y_pos_sub = memory.read_u8(y_pos_addr, "Combined WRAM")
 
-	if x_pos_sub >= 240 then
+	if x_pos_sub >= 240 and x_pos_sub ~= 256 then
 		gui.pixelText(x + gba_w - 70, y + gba_h - 14, string.format("%3d", x_pos_sub), 0xFFFFFFFF, c.t.green)
 	elseif x_pos_sub >= 224 then
 		gui.pixelText(x + gba_w - 70, y + gba_h - 14, string.format("%3d", x_pos_sub), 0xFFFFFFFF, c.t.orange)
@@ -48,7 +48,7 @@ local function Display(x, y)
 	end
 
 	-- This is reversed because Goku gets higher as Y gets lower. So the carry we want to optimise for for Y sub is as low as possible.
-	if y_pos_sub <= 16 then
+	if y_pos_sub <= 16 and x_pos_sub ~= 0 then
 		gui.pixelText(x + gba_w - 70, y + gba_h - 7, string.format("%3d", y_pos_sub), 0xFFFFFFFF, c.t.green)	
 	elseif y_pos_sub <= 32 then
 		gui.pixelText(x + gba_w - 70, y + gba_h - 7, string.format("%3d", y_pos_sub), 0xFFFFFFFF, c.t.orange)
