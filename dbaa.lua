@@ -19,6 +19,37 @@ local c = {
 local gba_w = 240
 local gba_h = 160
 
+-- A class for y subpixels
+-- ############################################################################
+local YSubpixelClass = {}
+
+function YSubpixelClass:add (number)
+	self.subpixel = (self.subpixel + number) % 256
+end
+
+local subpixel_auto = {subpixel = 0, add = SubpixelClass.add}
+-- Stores a register for how much the last jump changed Y-subpixel, and returns that register
+-- ############################################################################
+local function GetYSubpixelChangeValue()
+	local player_grounded = 0x205A1
+	local y_sx_addr = 0x0205C8
+	local pastYsx = {[0] = 0, [1] = 0}
+	local pastYsx = memory.read_u8(y_sx_addr)
+
+	pastYsx[1] = pastYsx[0]
+
+	local delta_Y_sx = pastYsx[1] - pastYsx[0]
+
+	if player_grounded ~= 0 then
+		subpixel_auto.add(delta_Y_sx)
+	end
+
+	return delta_Y_sx
+end
+	
+-- Records how much a subpixel value changed when player character is in the air and returns that value
+
+
 -- HUD that displays info in a static way on the screen (position, speed..)
 -- ############################################################################
 local function Display(x, y)
@@ -26,6 +57,7 @@ local function Display(x, y)
 	local y_pos_addr   = 0x0205C8
 	local x_speed_addr = 0x0205CC
 	local y_speed_addr = 0x0205CE
+	local y_subpixel_change_value_auto = GetYSubpixelChangeValue()
 
 	-- Speed display
 	gui.pixelText(x + gba_w - 21, y + gba_h - 14, string.format("%5d", memory.read_s16_le(x_speed_addr, "Combined WRAM")))
@@ -55,6 +87,9 @@ local function Display(x, y)
 	else
 		gui.pixelText(x + gba_w - 70, y + gba_h - 7, string.format("%3d", y_pos_sub))
 	end
+
+	-- Auto delta!
+	gui.pixelText(x + gba_w - 80, y + gba_h - 14, string.format("%3d", y_subpixel_change_value_auto), 0xFFFFFFFF, c.t.green)
 
 end
 
