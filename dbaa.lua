@@ -114,8 +114,8 @@ end
 -- Main loop.
 -- ############################################################################
 while true do
-	RNGTable(gba_w - 16, gba_h - 21)
--- 	Overlay(0, 0)
+	RNGTable(gba_w - 94, gba_h - 7)
+	Overlay(0, 0)
 	Display(0, 0)
 	emu.frameadvance()
 end
