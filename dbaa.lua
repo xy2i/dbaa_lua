@@ -26,7 +26,7 @@ local gba_h = 160
 -- ############################################################################
 local function RNGTable(x, y)
     local RNG_addr = 0x046C50
-    gui.pixelText(x + 50, y,  string.format("%04X", memory.read_u16_le(RNG_addr, "Combined WRAM")))
+    gui.pixelText(x, y,  string.format("%04X", memory.read_u16_le(RNG_addr, "Combined WRAM")))
     
 end
 
@@ -37,6 +37,7 @@ local function Display(x, y)
 	local y_pos_addr   = 0x0205C8
 	local x_speed_addr = 0x0205CC
 	local y_speed_addr = 0x0205CE
+	local player_grounded = 0x205A1
 
 	-- Speed display
 	gui.pixelText(x + gba_w - 21, y + gba_h - 14, string.format("%5d", memory.read_s16_le(x_speed_addr, "Combined WRAM")))
@@ -65,6 +66,13 @@ local function Display(x, y)
 		gui.pixelText(x + gba_w - 70, y + gba_h - 7, string.format("%3d", y_pos_sub), 0xFFFFFFFF, c.t.orange)
 	else
 		gui.pixelText(x + gba_w - 70, y + gba_h - 7, string.format("%3d", y_pos_sub))
+	end
+
+	-- Ground counter
+	if memory.read_u8(player_grounded, "Combined WRAM") == 1 then
+		gui.pixelText(x+165, y + gba_h - 7, "G", 0xFFFFFFFF, c.t.yellow)
+	else
+		gui.pixelText(x+165, y + gba_h - 7, "A", 0xFFFFFFFF, c.t.orange)
 	end
 
 end
@@ -106,7 +114,7 @@ end
 -- Main loop.
 -- ############################################################################
 while true do
-	RNGTable(0, 0)
+	RNGTable(gba_w - 16, gba_h - 21)
 -- 	Overlay(0, 0)
 	Display(0, 0)
 	emu.frameadvance()
