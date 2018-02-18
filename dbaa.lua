@@ -105,7 +105,19 @@ local function Overlay(x, y)
 		if enemy_HP > 0 then
 			local enemy_x = memory.read_u24_le(enemy_obj_addr + enemy_obj_x_pos_offset, "EWRAM")
 			local enemy_y = memory.read_u24_le(enemy_obj_addr + enemy_obj_y_pos_offset, "EWRAM")	
-			gui.pixelText(enemy_x - camera_x, enemy_y - camera_y, enemy_HP)
+			local enemy_x = enemy_x - camera_x
+			local enemy_y = enemy_y - camera_y
+		
+			-- Dumb huge switch statement..
+			if enemy_x > 231 then
+				enemy_x = 231
+			end
+			
+			if enemy_x < 0 then
+				enemy_x = 0
+			end
+			
+			gui.pixelText(enemy_x, enemy_y, string.format("%d", enemy_HP))
 		end
 	
 	end
