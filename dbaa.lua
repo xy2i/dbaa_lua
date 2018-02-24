@@ -100,24 +100,31 @@ local function Overlay(x, y)
 		else
 			enemy_obj_addr=enemy_obj_addr - 0x02000000
 		end
-	
-		local enemy_HP = memory.read_s16_le(enemy_obj_addr + enemy_obj_HP_offset, "EWRAM")
-		if enemy_HP > 0 then
-			local enemy_x = memory.read_u24_le(enemy_obj_addr + enemy_obj_x_pos_offset, "EWRAM")
-			local enemy_y = memory.read_u24_le(enemy_obj_addr + enemy_obj_y_pos_offset, "EWRAM")	
-			local enemy_x = enemy_x - camera_x
-			local enemy_y = enemy_y - camera_y
 		
-			-- Dumb huge switch statement..
-			if enemy_x > 231 then
-				enemy_x = 231
+		if enemy_obj_addr >= 0x01000000 then
+			enemy_obj_addr = enemy_obj_addr - 0x01000000
+			local enemy_HP = memory.read_s16_le(enemy_obj_addr + enemy_obj_HP_offset, "IWRAM")
+			if enemy_HP > 0 then
+				gui.pixelText(223, 11, string.format("%4s", enemy_HP))
 			end
+		else
+			local enemy_HP = memory.read_s16_le(enemy_obj_addr + enemy_obj_HP_offset, "EWRAM")
+			if enemy_HP > 0 then
+				local enemy_x = memory.read_u24_le(enemy_obj_addr + enemy_obj_x_pos_offset, "EWRAM")
+				local enemy_y = memory.read_u24_le(enemy_obj_addr + enemy_obj_y_pos_offset, "EWRAM")	
+				local enemy_x = enemy_x - camera_x
+				local enemy_y = enemy_y - camera_y
 			
-			if enemy_x < 0 then
-				enemy_x = 0
+				-- Dumb huge switch statement..
+				if enemy_x > 231 then
+					enemy_x = 231
+				end
+				if enemy_x < 0 then
+					enemy_x = 0
+				end
+				
+				gui.pixelText(enemy_x, enemy_y, string.format("%d", enemy_HP))
 			end
-			
-			gui.pixelText(enemy_x, enemy_y, string.format("%d", enemy_HP))
 		end
 	
 	end
