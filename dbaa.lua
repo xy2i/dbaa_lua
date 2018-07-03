@@ -30,9 +30,15 @@ local function RNGTable(x, y)
     
 end
 
+-- General overlay, displayed at all times.
+-- ############################################################################
+local function GeneralOverlay(x, y)
+	RNGTable(gba_w - 94, gba_h - 7)
+end
+
 -- HUD that displays info in a static way on the screen (position, speed..)
 -- ############################################################################
-local function Display(x, y)
+local function EnemyDisplay(x, y)
 	local x_pos_addr   = 0x0205C4
 	local y_pos_addr   = 0x0205C8
 	local x_speed_addr = 0x0205CC
@@ -77,10 +83,11 @@ local function Display(x, y)
 
 end
 
--- Overlay on various objects.
+-- Overlay for platforming mode.
 -- ############################################################################
-local function Overlay(x, y)
-	
+local function PlatformOverlay()    
+    EnemyDisplay() -- lol no OOP cause lazy
+    
 	local camera_x_pos_addr      = 0x029EE8
 	local camera_y_pos_addr      = 0x029EEC
 	local enemy_pointers_addr    = 0x027E00
@@ -114,8 +121,7 @@ local function Overlay(x, y)
 				local enemy_y = memory.read_u24_le(enemy_obj_addr + enemy_obj_y_pos_offset, "EWRAM")	
 				local enemy_x = enemy_x - camera_x
 				local enemy_y = enemy_y - camera_y
-			
-				-- Dumb huge switch statement..
+				
 				if enemy_x > 231 then
 					enemy_x = 231
 				end
@@ -126,15 +132,36 @@ local function Overlay(x, y)
 				gui.pixelText(enemy_x, enemy_y, string.format("%d", enemy_HP))
 			end
 		end
-	
-	end
+    end
 end
- 
--- Main loop.
+
+-- Overlay for platforming mode.
+-- ############################################################################
+local function VSOverlay(x, y)
+	local enemy_HP = memory.read_s16_le(0x029A56, "EWRAM")
+	local enemy_shield = memory.read_s16_le(0x029A58, "EWRAM")
+	local enemy_shield_regen_timer = bit.rshift(
+		memory.read_u16_le(0x029A5A, "EWRAM"), 4)
+	
+	gui.pixelText(x + gba_w - 16, y + gba_h - 21, string.format("%4d", enemy_HP))
+	
+	if enemy_shield > 0 then
+		gui.pixelText(x + gba_w - 16, y + gba_h - 28, string.format("%4d", enemy_shield), 0xFF000000, c.t.green)
+	else
+		gui.pixelText(x + gba_w - 16, y + gba_h - 28, string.format("%4d", enemy_shield))
+	end
+	
+	gui.pixelText(x + gba_w - 16, y + gba_h - 35, string.format("%4d", enemy_shield_regen_timer), 0xFFFFFFFF, c.t.orange)
+end
+
 -- ############################################################################
 while true do
-	RNGTable(gba_w - 94, gba_h - 7)
-	Overlay(0, 0)
-	Display(0, 0)
+	GeneralOverlay(0, 0)
+	if memory.read_s16_le(0x029A56, "EWRAM") =! 0 -- Does VS enemy have HP?
+		VSOverlay(0, 0)
+	else
+		PlatformOverlay()
+	end
+	
 	emu.frameadvance()
 end
