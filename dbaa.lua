@@ -86,7 +86,7 @@ end
 -- Overlay for platforming mode.
 -- ############################################################################
 local function PlatformOverlay()    
-    EnemyDisplay() -- lol no OOP cause lazy
+    EnemyDisplay(x, y) -- lol no OOP cause lazy
     
 	local camera_x_pos_addr      = 0x029EE8
 	local camera_y_pos_addr      = 0x029EEC
@@ -157,7 +157,7 @@ end
 -- ############################################################################
 while true do
 	GeneralOverlay(0, 0)
-	if memory.read_s16_le(0x029A56, "EWRAM") =! 0  then -- Does VS enemy have HP?
+	if memory.read_s16_le(0x029A56, "EWRAM") ~= 0  then -- Does VS enemy have HP?
 		VSOverlay(0, 0)
 	else
 		PlatformOverlay()
