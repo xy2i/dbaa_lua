@@ -86,7 +86,7 @@ end
 -- Overlay for platforming mode.
 -- ############################################################################
 local function PlatformOverlay()    
-    EnemyDisplay(x, y) -- lol no OOP cause lazy
+    EnemyDisplay(0, 0) -- lol no OOP cause lazy
     
 	local camera_x_pos_addr      = 0x029EE8
 	local camera_y_pos_addr      = 0x029EEC
